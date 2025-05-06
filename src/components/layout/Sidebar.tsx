@@ -1,5 +1,8 @@
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import { useAppSelector } from "@/hooks/useAppSelector";
@@ -27,14 +30,14 @@ interface SidebarProps {
 
 const Sidebar = ({ open }: SidebarProps) => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const router = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
 
   const menuItems = [
     {
       title: "My Profile",
-      path: "/",
+      path: "/profile",
       icon: <User className="w-5 h-5 mr-2" />,
     },
     {
@@ -57,8 +60,8 @@ const Sidebar = ({ open }: SidebarProps) => {
   const handleSignOut = () => {
     // Here you would implement actual sign-out logic
     toast.success("You have been signed out successfully");
-    // Normally you would redirect to login page
-    navigate("/");
+    // Redirect to home page
+    router.push("/");
   };
 
   return (
@@ -97,11 +100,11 @@ const Sidebar = ({ open }: SidebarProps) => {
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
             {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = pathname === item.path;
               return (
                 <Link
                   key={item.path}
-                  to={item.path}
+                  href={item.path}
                   className={cn(
                     "flex items-center px-2 py-2 rounded-md transition-colors",
                     isActive

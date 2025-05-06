@@ -2,7 +2,7 @@
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import { Bell, Menu } from "lucide-react";
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +12,12 @@ import {
 
 const Header = () => {
   const dispatch = useAppDispatch();
-  const location = useLocation();
+  const pathname = usePathname();
 
   // Get the page title based on the current path
   const getPageTitle = () => {
-    switch (location.pathname) {
-      case "/":
+    switch (pathname) {
+      case "/profile":
         return "My Profile";
       case "/security":
         return "Security";
