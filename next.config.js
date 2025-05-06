@@ -27,10 +27,12 @@ const nextConfig = {
       },
     ];
   },
-  // Define process.env for client-side to fix "process is not defined" errors
-  env: {
+  // Define publicRuntimeConfig for client-side environment variables
+  publicRuntimeConfig: {
     BASE_PATH: '',
-  }
+  },
+  // Add basePath if needed
+  basePath: '',
 };
 
 module.exports = nextConfig;
