@@ -32,7 +32,7 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   }, [dispatch]);
 
   return (
-    <div className="dashboard-layout">
+    <div className="dashboard-layout flex min-h-screen">
       <Sidebar open={sidebarOpen} />
       <div className="flex flex-col w-full min-h-screen">
         <Header />

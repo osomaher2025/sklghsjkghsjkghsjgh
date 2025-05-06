@@ -26,6 +26,10 @@ const nextConfig = {
         permanent: true,
       },
     ];
+  },
+  // Define process.env for client-side to fix "process is not defined" errors
+  env: {
+    BASE_PATH: '',
   }
 };
 
