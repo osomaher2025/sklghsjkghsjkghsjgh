@@ -1,5 +1,5 @@
 
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { toggleSidebar } from "@/store/slices/uiSlice";
 import { useAppSelector } from "@/hooks/useAppSelector";
@@ -9,8 +9,17 @@ import {
   Shield, 
   Briefcase, 
   Settings,
-  ChevronLeft
+  ChevronLeft,
+  LogOut
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/sonner";
 
 interface SidebarProps {
   open: boolean;
@@ -19,6 +28,7 @@ interface SidebarProps {
 const Sidebar = ({ open }: SidebarProps) => {
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const navigate = useNavigate();
   const { currentUser } = useAppSelector((state) => state.user);
 
   const menuItems = [
@@ -43,6 +53,13 @@ const Sidebar = ({ open }: SidebarProps) => {
       icon: <Settings className="w-5 h-5 mr-2" />,
     },
   ];
+  
+  const handleSignOut = () => {
+    // Here you would implement actual sign-out logic
+    toast.success("You have been signed out successfully");
+    // Normally you would redirect to login page
+    navigate("/");
+  };
 
   return (
     <aside
@@ -102,17 +119,67 @@ const Sidebar = ({ open }: SidebarProps) => {
 
         {open && currentUser && (
           <div className="px-4 py-2 border-t border-sidebar-border">
-            <div className="flex items-center">
-              <img
-                src={currentUser.avatar || "/placeholder.svg"}
-                alt={currentUser.name}
-                className="h-8 w-8 rounded-full"
-              />
-              <div className="ml-2">
-                <p className="text-sm font-medium">{currentUser.name}</p>
-                <p className="text-xs text-sidebar-foreground/80">{currentUser.position}</p>
-              </div>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="w-full">
+                <div className="flex items-center cursor-pointer hover:bg-sidebar-accent/20 p-2 rounded-md transition-colors w-full">
+                  <img
+                    src={currentUser.avatar || "/placeholder.svg"}
+                    alt={currentUser.name}
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <div className="ml-2 text-left">
+                    <p className="text-sm font-medium">{currentUser.name}</p>
+                    <p className="text-xs text-sidebar-foreground/80">{currentUser.position}</p>
+                  </div>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/")}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
+        {!open && currentUser && (
+          <div className="px-4 py-2 border-t border-sidebar-border flex justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="rounded-full p-0">
+                  <img
+                    src={currentUser.avatar || "/placeholder.svg"}
+                    alt={currentUser.name}
+                    className="h-8 w-8 rounded-full"
+                  />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => navigate("/")}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/settings")}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Settings</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sign out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         )}
       </div>

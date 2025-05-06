@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import {
   ArrowUp,
@@ -46,6 +47,15 @@ import {
 } from "@/components/ui/dialog";
 import JobPostForm from "@/components/job-posts/JobPostForm";
 import { toast } from "@/components/ui/sonner";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 const statusColors = {
   Active: "bg-green-100 text-green-800",
@@ -53,12 +63,15 @@ const statusColors = {
   Draft: "bg-gray-100 text-gray-800",
 };
 
+const ITEMS_PER_PAGE = 10;
+
 const JobPosts = () => {
   const dispatch = useAppDispatch();
   const { items, filters, sort } = useAppSelector((state) => state.jobPosts);
   const { currentModal } = useAppSelector((state) => state.ui);
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Filter options
   const jobTypes = ["Full-time", "Part-time", "Contract", "Temporary", "Internship"];
@@ -103,6 +116,7 @@ const JobPosts = () => {
         search: e.target.value,
       })
     );
+    setCurrentPage(1); // Reset to first page on search
   };
 
   const handleFilterChange = (
@@ -120,6 +134,7 @@ const JobPosts = () => {
         [filterType]: updatedValues,
       })
     );
+    setCurrentPage(1); // Reset to first page on filter change
   };
 
   const handleClearFilters = () => {
@@ -131,6 +146,7 @@ const JobPosts = () => {
         search: "",
       })
     );
+    setCurrentPage(1); // Reset to first page on filter clear
   };
 
   // Apply filters and sorting
@@ -158,6 +174,98 @@ const JobPosts = () => {
     if (a[sort.column] > b[sort.column]) return 1 * factor;
     return 0;
   });
+
+  // Pagination
+  const totalPages = Math.ceil(sortedJobs.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedJobs = sortedJobs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const renderPaginationItems = () => {
+    // Create an array for pagination display
+    const pages = [];
+    
+    // Always show the first page
+    pages.push(
+      <PaginationItem key="page-1">
+        <PaginationLink 
+          isActive={currentPage === 1}
+          onClick={() => handlePageChange(1)}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+    
+    // Logic for showing ellipsis and middle pages
+    if (totalPages > 5) {
+      if (currentPage > 3) {
+        pages.push(
+          <PaginationItem key="ellipsis-1">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+      
+      // Calculate range of page numbers to show
+      const start = Math.max(2, currentPage - 1);
+      const end = Math.min(totalPages - 1, currentPage + 1);
+      
+      for (let i = start; i <= end; i++) {
+        pages.push(
+          <PaginationItem key={`page-${i}`}>
+            <PaginationLink
+              isActive={currentPage === i}
+              onClick={() => handlePageChange(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+      
+      if (currentPage < totalPages - 2) {
+        pages.push(
+          <PaginationItem key="ellipsis-2">
+            <PaginationEllipsis />
+          </PaginationItem>
+        );
+      }
+    } else {
+      // For small number of pages, show all
+      for (let i = 2; i < totalPages; i++) {
+        pages.push(
+          <PaginationItem key={`page-${i}`}>
+            <PaginationLink
+              isActive={currentPage === i}
+              onClick={() => handlePageChange(i)}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
+      }
+    }
+    
+    // Always show the last page if there's more than one page
+    if (totalPages > 1) {
+      pages.push(
+        <PaginationItem key={`page-${totalPages}`}>
+          <PaginationLink
+            isActive={currentPage === totalPages}
+            onClick={() => handlePageChange(totalPages)}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return pages;
+  };
 
   const activeFiltersCount =
     (filters.status.length > 0 ? 1 : 0) +
@@ -386,7 +494,7 @@ const JobPosts = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedJobs.length === 0 ? (
+                {paginatedJobs.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8">
                       <p className="text-gray-500">No job posts found</p>
@@ -400,7 +508,7 @@ const JobPosts = () => {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  sortedJobs.map((job) => (
+                  paginatedJobs.map((job) => (
                     <TableRow key={job.id}>
                       <TableCell>
                         <div>
@@ -447,6 +555,31 @@ const JobPosts = () => {
               </TableBody>
             </Table>
           </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-4">
+              <Pagination>
+                <PaginationContent>
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
+                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                  
+                  {renderPaginationItems()}
+                  
+                  <PaginationItem>
+                    <PaginationNext 
+                      onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
+                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            </div>
+          )}
         </div>
       </Card>
 
