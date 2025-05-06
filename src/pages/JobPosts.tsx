@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   ArrowUp,
@@ -19,7 +18,7 @@ import {
   setSort,
 } from "@/store/slices/jobPostSlice";
 import { setCurrentModal } from "@/store/slices/uiSlice";
-import { JobPostType, SortDirection } from "@/types";
+import { JobPost, SortDirection } from "@/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";

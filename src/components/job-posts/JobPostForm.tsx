@@ -1,7 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { useAppDispatch, useAppSelector } from "@/hooks/useAppSelector";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useAppSelector } from "@/hooks/useAppSelector";
 import { addJobPost, updateJobPost } from "@/store/slices/jobPostSlice";
 import { setCurrentModal } from "@/store/slices/uiSlice";
 import { JobPost } from "@/types";

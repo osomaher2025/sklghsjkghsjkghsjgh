@@ -1,6 +1,7 @@
 
 import { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "@/hooks/useAppSelector";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useAppSelector } from "@/hooks/useAppSelector";
 import { setSidebarOpen } from "@/store/slices/uiSlice";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
